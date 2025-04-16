@@ -1,6 +1,5 @@
 import { cosmiconfigSync } from "cosmiconfig";
 import { TypeScriptLoader } from "cosmiconfig-typescript-loader";
-import type { RsticConfig } from "./types/config";
 import { BASE_DIR } from "./constans";
 import path from "path";
 
@@ -24,6 +23,15 @@ const explorer = cosmiconfigSync(moduleName, {
     ".ts": TypeScriptLoader(),
   },
 });
+
+export interface RsticConfig {
+  pagesDir: string;
+  outputDir: string;
+  watchDirs: string | string[];
+  watchFiles: string[];
+  supportFiles: string[];
+  publicDir: string;
+}
 
 const defaultConfig: RsticConfig = {
   pagesDir: "src/pages",

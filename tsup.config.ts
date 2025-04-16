@@ -7,7 +7,7 @@ export default defineConfig([
     dts: true,
     splitting: false,
     clean: true,
-    // minify: true,
+    minify: true,
     shims: true,
   },
   {
@@ -15,7 +15,7 @@ export default defineConfig([
     format: ["cjs"],
     splitting: false,
     clean: true,
-    // minify: true,
+    minify: true,
     shims: true,
   },
 ]);
