@@ -6,6 +6,8 @@ import { renderedHtmlString } from "./render";
 
 export async function productionBuild() {
   try {
+    await fs.ensureDir(BUILD_DIR);
+
     await fs.emptyDir(BUILD_DIR);
     console.log("🧹 Cleared output directory.");
 
@@ -32,9 +34,10 @@ export async function productionBuild() {
       }
     }
 
-    const serverFilePath = path.join(BUILD_DIR, "server.js");
-    const serverCode = 'require("rstic").liveServer();';
-    await fs.writeFile(serverFilePath, serverCode, "utf-8");
+    const cjsCode = 'require("rstic").startLiveServer();';
+    const esmCode = `import { startLiveServer } from 'rstic';\nstartLiveServer();`;
+    await fs.writeFile(path.join(BUILD_DIR, "server.js"), cjsCode, "utf-8");
+    await fs.writeFile(path.join(BUILD_DIR, "server.mjs"), esmCode, "utf-8");
     console.log("✅ server.js created in dist with live server code");
   } catch (error) {
     console.error("❌ Error during build:", error);

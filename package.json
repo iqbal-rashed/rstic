@@ -1,10 +1,10 @@
 {
   "name": "rstic",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A blazing-fast static site generator with live reload and EJS support, designed for modern development workflows.",
   "license": "MIT",
   "bin": {
-    "rstic": "./dist/index.js"
+    "rstic": "./dist/cli.js"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
