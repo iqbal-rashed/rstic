@@ -1,23 +1,23 @@
-# 🌐 rstic
+# 🌐 rstic — Static Site Generator for Modern Developers
 
-**rstic** is a blazing-fast, zero-config static site generator built with Node.js. It supports `.html` and `.ejs` templates, offers automatic file-based routing, and comes with **live reload** powered by WebSockets. Perfect for developers who want fast iteration while building static websites.
+**rstic** is a blazing-fast, zero-config static site generator built with Node.js. It supports `.html` and `.ejs` templates, automatic file-based routing, and live reload powered by WebSockets. It's lightweight, pluggable, and perfect for developers who want fast iteration while building static websites.
 
 ---
 
 ## 🚀 Features
 
 - ⚡ Instant live reload on file changes (HTML, EJS, JSON)
-- 🧩 EJS template support with data injection
+- 🧩 EJS template support with automatic JSON data injection
 - 🔁 Automatic route generation based on file structure
-- 📁 `public/` directory for static assets
+- 🗃️ Custom HTML templating engine with `<value>`, `<loop>`, `<if>`, `<include>`
+- 🔧 Configurable via `.rsticrc.*` or `rstic.config.*` using `cosmiconfig`
 - 🧠 `.json` data file support for each template
-- 🛠️ Developer-friendly CLI
+- 📁 `public/` directory for static assets
+- 🛠️ Developer-friendly CLI (`dev`, `build`, `start`)
 
 ---
 
 ## 📦 Installation
-
-You can install rstic with:
 
 ```bash
 npm install --save-dev rstic
@@ -27,49 +27,115 @@ npm install --save-dev rstic
 
 ## 🔧 Usage
 
-### Start the development server:
+### Start Development Server with Live Reload
 
 ```bash
 npx rstic dev
 ```
 
-By default, this runs the server at [http://localhost:3003](http://localhost:3003)
+Starts the server on [http://localhost:3003](http://localhost:3003) with live reload for `.ejs`, `.html`, `.json`, and `.css`.
 
-### Folder structure
+### Build for Production
 
-rstic automatically detects the `pages` directory:
+```bash
+npx rstic build
+```
+
+Generates static HTML files in the `dist/` directory based on the defined config.
+
+### Serve Built Site
+
+```bash
+npx rstic start
+```
+
+Serves the built `dist/` directory with live preview.
+
+---
+
+## 🗂️ Folder Structure
 
 ```bash
 project/
-├── public/               # Static files served directly
+├── public/               # Static files (served directly)
 ├── src/
 │   └── pages/
 │       ├── index.ejs     # Renders at "/"
 │       ├── about.html    # Renders at "/about"
 │       ├── contact.ejs   # Renders at "/contact"
 │       └── blog/
-│           └── post.ejs  # Renders at "/blog/post"
-│           └── post.json # Optional JSON data injected into post.ejs
+│           ├── post.ejs  # Renders at "/blog/post"
+│           └── post.json # Injected into post.ejs
 ```
 
-You can also place `pages/` directly in the root instead of `src/pages`.
+You can also use `pages/` in the root folder instead of `src/pages`.
 
 ---
 
-## ✨ Template Features
+## ⚙️ Configuration (Optional)
 
-- `.ejs` and `.html` files are treated as templates.
-- `.json` file with the same name as the template (e.g., `about.json` for `about.ejs`) will be automatically loaded and injected as data.
-- `_` prefixed templates are ignored (e.g., `_layout.ejs`).
+rstic uses `cosmiconfig` to allow flexible config loading:
 
-## 📚 CLI Help (coming soon)
+Supported config filenames:
+
+```
+.rsticrc, .rsticrc.json, .rsticrc.yaml, .rsticrc.ts,
+rstic.config.js, rstic.config.ts, etc.
+```
+
+Default config structure:
+
+```ts
+{
+  pagesDir: "src/pages",
+  outputDir: "dist",
+  watchDirs: ["src"],
+  watchFiles: [".html", ".ejs", ".css", ".js"],
+  supportFiles: [".html", ".ejs"],
+  publicDir: "public"
+}
+```
+
+---
+
+## 🧩 Template Engine Tags
+
+rstic supports custom tags for powerful template logic:
+
+### `<value key="path.to.value" />`
+
+Injects a value from the data.
+
+### `<loop data="items" var="item" index="i">...</loop>`
+
+Repeats inner HTML for each item in the array.
+
+### `<if condition="data.exists">...</if>`
+
+Renders content only if the condition evaluates truthy.
+
+### `<include src="./partials/header.html" />`
+
+Includes other HTML files (use relative paths).
+
+---
+
+## 📚 CLI Commands
 
 ```bash
-rstic --help
+npx rstic --help
 ```
+
+### Available commands:
+
+- `dev`: Start Express dev server with live reload
+- `build`: Build static HTML to the output folder
+- `start`: Start static live server from build directory
+
+---
 
 ## 🤝 Contributing
 
-Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
+Pull requests are welcome! Open an issue first to discuss what you’d like to change.
 
-Please make sure to update tests as appropriate.
+Make sure to update tests as appropriate.
