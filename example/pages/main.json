@@ -1,0 +1,22 @@
+{
+  "user": {
+    "name": "Jane Doe",
+    "balance": 1234.56
+  },
+  "items": [
+    {
+      "name": "Apple",
+      "quantity": 3,
+      "price": 0.5,
+      "discount": 0
+    },
+    {
+      "name": "Banana",
+      "quantity": 0,
+      "price": 0.3,
+      "discount": 10
+    }
+  ],
+  "reportDate": "2025-04-17",
+  "footerText": "© 2025 Acme Corp."
+}

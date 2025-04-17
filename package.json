@@ -1,6 +1,6 @@
 {
   "name": "rstic",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "A blazing-fast static site generator with live reload and EJS support, designed for modern development workflows.",
   "license": "MIT",
   "bin": {
@@ -19,6 +19,7 @@
   },
   "scripts": {
     "build": "tsup",
+    "dev": "nodemon --watch src --ext ts --exec \"tsx src/cli.ts dev -c example/rstic.config.js\"",
     "test": "jest",
     "lint": "eslint",
     "format": "prettier --ignore-path .gitignore --write \"./src/**/*.+(js|ts|json)\"",
@@ -70,6 +71,7 @@
   },
   "dependencies": {
     "chokidar": "^4.0.3",
+    "commander": "^13.1.0",
     "cosmiconfig": "^9.0.0",
     "cosmiconfig-typescript-loader": "^6.1.0",
     "ejs": "^3.1.10",

@@ -3,7 +3,7 @@ import http from "http";
 import { WebSocketServer } from "ws";
 import { debounce } from "./utils";
 import { registerDevRoutes } from "./routes";
-import { pagesWatcher, watcher } from "./watcher";
+import { getPagesWatcher, getWatcher } from "./watcher";
 import path from "path";
 import { PAGES_DIR, PUBLIC_DIR } from "./configfile";
 
@@ -16,6 +16,9 @@ export function startDevServer() {
   registerDevRoutes(app, PAGES_DIR);
 
   const debounceBroadcastReload = debounce(broadcastReload, 500);
+
+  const watcher = getWatcher();
+  const pagesWatcher = getPagesWatcher();
 
   watcher.on("change", (filePath) => {
     console.log(`File changed: ${path.basename(filePath)}`);

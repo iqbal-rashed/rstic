@@ -1,5 +1,6 @@
 import fs from "fs-extra";
 import path from "path";
+import vm from "vm";
 import { parse, HTMLElement } from "node-html-parser";
 
 export interface TemplateData {
@@ -8,6 +9,66 @@ export interface TemplateData {
 
 function getValueByPath(obj: any, pathStr: string): any {
   return pathStr.split(".").reduce((acc, key) => acc?.[key], obj);
+}
+
+function processInlineExpressions(str: string, data: TemplateData): string {
+  const sandbox = { ...(data || {}) };
+  const context = vm.createContext(sandbox);
+
+  return str.replace(/\{\{\s*([^}]+)\s*\}\}/g, (_, expr) => {
+    try {
+      return vm.runInContext(`(${expr})`, context);
+    } catch (err) {
+      console.warn("Template expression error:", expr, err);
+      return "";
+    }
+  });
+}
+
+async function renderTemplate(
+  template: string,
+  data: TemplateData,
+  baseDir: string
+): Promise<string> {
+  const root = parse(template, { comment: true });
+
+  await processIncludeTags(root, data, baseDir);
+  await processLoopTags(root, data, baseDir);
+  await processIfTags(root, data, baseDir);
+  await processValueTags(root, data);
+
+  const out = root.toString();
+  return processInlineExpressions(out, data);
+}
+
+async function processIncludeTags(
+  root: HTMLElement,
+  data: TemplateData,
+  baseDir: string
+) {
+  const includeTags = root.querySelectorAll("include");
+  for (const tag of includeTags) {
+    const includePath = tag.getAttribute("src");
+    if (!includePath) continue;
+
+    const passed: Record<string, any> = {};
+    for (const [name, value] of Object.entries(tag.attributes)) {
+      if (name === "src") continue;
+      passed[name] = processInlineExpressions(value, data);
+    }
+
+    const includeContext = { ...data, ...passed };
+
+    const fullPath = path.resolve(baseDir, includePath);
+    const content = await fs.readFile(fullPath, "utf8");
+    const rendered = await renderTemplate(
+      content,
+      includeContext,
+      path.dirname(fullPath)
+    );
+
+    tag.replaceWith(parse(rendered));
+  }
 }
 
 function processValueTags(root: HTMLElement, data: TemplateData): void {
@@ -42,6 +103,7 @@ async function processLoopTags(
     const renderedItems = await Promise.all(
       array.map(async (item: any, index: number) => {
         const loopContext = { ...data, [varName]: item, [indexName]: index };
+
         const rendered = await renderTemplate(
           loopTag.innerHTML,
           loopContext,
@@ -63,57 +125,29 @@ async function processIfTags(
   const ifTags = root.querySelectorAll("if");
 
   for (const tag of ifTags) {
-    const condition = tag.getAttribute("condition");
-    if (!condition) {
+    const conditionExpr = tag.getAttribute("condition")?.trim();
+    if (!conditionExpr) {
       tag.remove();
       continue;
     }
 
-    const value = getValueByPath(data, condition);
-    if (value) {
+    let keep = false;
+    try {
+      const sandbox = { ...data };
+      const context = vm.createContext(sandbox);
+      const result = vm.runInContext(`(${conditionExpr})`, context);
+      keep = Boolean(result);
+    } catch (err) {
+      console.warn("Error evaluating <if> condition:", conditionExpr, err);
+    }
+
+    if (keep) {
       const rendered = await renderTemplate(tag.innerHTML, data, baseDir);
       tag.replaceWith(rendered.toString());
     } else {
       tag.remove();
     }
   }
-}
-
-async function processIncludeTags(
-  root: HTMLElement,
-  data: TemplateData,
-  baseDir: string
-) {
-  const includeTags = root.querySelectorAll("include");
-
-  for (const tag of includeTags) {
-    const includePath = tag.getAttribute("src");
-    if (!includePath) continue;
-
-    const fullPath = path.resolve(baseDir, includePath);
-    const content = await fs.readFile(fullPath, "utf8");
-    const rendered = await renderTemplate(
-      content,
-      data,
-      path.dirname(fullPath)
-    );
-    tag.replaceWith(parse(rendered));
-  }
-}
-
-async function renderTemplate(
-  template: string,
-  data: TemplateData,
-  baseDir: string
-): Promise<string> {
-  const root = parse(template, { comment: true });
-
-  await processIncludeTags(root, data, baseDir);
-  await processIfTags(root, data, baseDir);
-  await processLoopTags(root, data, baseDir);
-  await processValueTags(root, data);
-
-  return root.toString();
 }
 
 export async function renderFile(

@@ -1,0 +1,12 @@
+<div class="card">
+  <h2>{{ title.toUpperCase() }}</h2>
+  <p>Price: ${{ parseInt(price).toFixed(2) }}</p>
+
+  <!-- inline‐JS ternary plus <if> inside an include -->
+  <if condition="showDiscount">
+    <p>Discount: {{ discount }}%</p>
+  </if>
+
+  <!-- even arbitrary JS works: -->
+  <p>Next price: ${{ (price * (1 - (discount||0)/100)).toFixed(2) }}</p>
+</div>

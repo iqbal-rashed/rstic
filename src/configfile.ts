@@ -2,8 +2,11 @@ import { cosmiconfigSync } from "cosmiconfig";
 import { TypeScriptLoader } from "cosmiconfig-typescript-loader";
 import { BASE_DIR } from "./constans";
 import path from "path";
+import { program } from "./prompts";
 
 const moduleName = "rstic";
+
+const configFile = program.opts().config || null;
 
 const explorer = cosmiconfigSync(moduleName, {
   searchPlaces: [
@@ -18,7 +21,7 @@ const explorer = cosmiconfigSync(moduleName, {
     `${moduleName}.config.js`,
     `${moduleName}.config.ts`,
     `${moduleName}.config.cjs`,
-  ],
+  ].concat(configFile ? [configFile] : []),
   loaders: {
     ".ts": TypeScriptLoader(),
   },
@@ -37,7 +40,7 @@ const defaultConfig: RsticConfig = {
   pagesDir: "src/pages",
   outputDir: "dist",
   watchDirs: ["src"],
-  watchFiles: [".html", ".ejs", ".css", ".js"],
+  watchFiles: [".html", ".ejs", ".css", ".js", ".json"],
   supportFiles: [".html", ".ejs"],
   publicDir: "public",
 };

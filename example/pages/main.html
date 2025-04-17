@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Template Engine Test</title>
+  </head>
+  <body>
+    <!-- 1. Inline expressions & .toUpperCase(), arithmetic, ternary -->
+    <h1>Welcome, {{ user.name }}!</h1>
+    <p>
+      Your balance is ${{ user.balance }} ({{ user.balance > 0 ? "Good standing"
+      : "Oops, overdrawn" }})
+    </p>
+
+    <!-- 2. <if> with a JS expression -->
+    <if condition="user.balance >= 1000">
+      <p><strong>🎉 You’re a VIP user!</strong></p>
+    </if>
+    <if condition="user.balance < 1000">
+      <p>Top up to $1,000 to become a VIP.</p>
+    </if>
+
+    <!-- 3. <loop> over an array -->
+    <h2>Your items:</h2>
+    <ul>
+      <loop data="items" var="item" index="i">
+        <li>
+          #{{ i + 1 }} – {{ item.name }} (x{{ item.quantity }})
+          <if condition="item.quantity === 0">
+            <em>– out of stock</em>
+          </if>
+        </li>
+      </loop>
+    </ul>
+
+    <!-- 4. <value> tags for simple property injection -->
+    <p>Report generated on: <value key="reportDate" /></p>
+
+    <!-- 5. <include> with passed parameters -->
+    <h2>Featured Product</h2>
+    <include
+      src="../components/card.html"
+      title="{{ items[0].name }}"
+      price="{{ items[0].price }}"
+      showDiscount="{{ items[0].discount > 0 }}"
+      discount="{{ items[0].discount }}"
+    />
+
+    <!-- 6. Final inline expression in plain text -->
+    <p>
+      Total items in cart: {{ items.reduce((sum, it) => sum + it.quantity, 0) }}
+    </p>
+
+    <!-- 7. footer via <value> -->
+    <footer><value key="footerText" /></footer>
+  </body>
+</html>
