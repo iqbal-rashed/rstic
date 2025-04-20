@@ -6,7 +6,9 @@ import { program } from "./prompts";
 
 const moduleName = "rstic";
 
-const configFile = program.opts().config || null;
+const programOpts = program.opts();
+
+const configFile = programOpts.config || null;
 
 const explorer = cosmiconfigSync(moduleName, {
   searchPlaces: [
@@ -34,6 +36,8 @@ export interface RsticConfig {
   watchFiles: string[];
   supportFiles: string[];
   publicDir: string;
+  build: "static" | "server";
+  port: number;
 }
 
 const defaultConfig: RsticConfig = {
@@ -43,6 +47,8 @@ const defaultConfig: RsticConfig = {
   watchFiles: [".html", ".ejs", ".css", ".js", ".json"],
   supportFiles: [".html", ".ejs"],
   publicDir: "public",
+  build: programOpts.build || "server",
+  port: 3003,
 };
 
 const searchedFor = explorer.search(BASE_DIR);

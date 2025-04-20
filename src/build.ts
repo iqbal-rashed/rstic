@@ -1,6 +1,6 @@
 import path from "path";
 import { getAllTemplates } from "./template";
-import { BUILD_DIR, PAGES_DIR } from "./configfile";
+import { BUILD_DIR, PAGES_DIR, configs, PUBLIC_DIR } from "./configfile";
 import fs from "fs-extra";
 import { renderedHtmlString } from "./render";
 
@@ -12,7 +12,10 @@ export async function productionBuild() {
     console.log("🧹 Cleared output directory.");
 
     const templates = getAllTemplates(PAGES_DIR);
-    const outputPagesDir = path.join(BUILD_DIR, "pages");
+    const outputPagesDir = path.join(
+      BUILD_DIR,
+      configs.build == "static" ? "" : "pages"
+    );
 
     await fs.ensureDir(outputPagesDir);
 
@@ -34,11 +37,20 @@ export async function productionBuild() {
       }
     }
 
-    const cjsCode = 'require("rstic").startLiveServer();';
-    const esmCode = `import { startLiveServer } from 'rstic';\nstartLiveServer();`;
-    await fs.writeFile(path.join(BUILD_DIR, "server.js"), cjsCode, "utf-8");
-    await fs.writeFile(path.join(BUILD_DIR, "server.mjs"), esmCode, "utf-8");
-    console.log("✅ server.js created in dist with live server code");
+    if (configs.build == "server") {
+      const cjsCode = 'require("rstic").startLiveServer();';
+      const esmCode = `import { startLiveServer } from 'rstic';\nstartLiveServer();`;
+      await fs.writeFile(path.join(BUILD_DIR, "server.js"), cjsCode, "utf-8");
+      await fs.writeFile(path.join(BUILD_DIR, "server.mjs"), esmCode, "utf-8");
+      console.log("✅ server.js created in dist with live server code");
+    }
+
+    if (configs.build == "static") {
+      const isPublicDirExist = await fs.pathExists(PUBLIC_DIR);
+      if (isPublicDirExist) {
+        await fs.copy(PUBLIC_DIR, BUILD_DIR);
+      }
+    }
   } catch (error) {
     console.error("❌ Error during build:", error);
   }

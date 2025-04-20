@@ -1,6 +1,6 @@
 {
   "name": "rstic",
-  "version": "0.0.7",
+  "version": "0.0.10-beta",
   "description": "A blazing-fast static site generator with live reload and EJS support, designed for modern development workflows.",
   "license": "MIT",
   "bin": {
@@ -19,7 +19,8 @@
   },
   "scripts": {
     "build": "tsup",
-    "dev": "nodemon --watch src --ext ts --exec \"tsx src/cli.ts dev -c example/rstic.config.js\"",
+    "dev:example": "nodemon --watch src --ext ts --exec \"tsx src/cli.ts dev -c example/rstic.config.js\"",
+    "build:example": "tsx src/cli.ts build -c example/rstic.config.js",
     "test": "jest",
     "lint": "eslint",
     "format": "prettier --ignore-path .gitignore --write \"./src/**/*.+(js|ts|json)\"",

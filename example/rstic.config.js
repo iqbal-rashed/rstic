@@ -5,5 +5,5 @@ module.exports = {
   watchDirs: ["example"],
   watchFiles: [".html", ".ejs", ".css", ".js", ".json"],
   supportFiles: [".html", ".ejs"],
-  publicDir: "public",
+  publicDir: "example/public",
 };

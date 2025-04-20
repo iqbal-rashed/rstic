@@ -4,14 +4,28 @@ export const program = new Command();
 
 program
   .name("rstic")
-  .description("RSTIC static‑site tool")
+  .description("RSTIC static-site tool")
   .option("-c, --config <path>", "path to config file")
+  .option("--pages-dir <dir>", "source pages directory")
+  .option("--output-dir <dir>", "output directory for generated files")
   .option(
-    "-p, --port <number>",
-    "port to listen on",
-    (v) => parseInt(v, 10),
-    3003
-  );
+    "--watch-dirs <dirs>",
+    "directories to watch (comma-separated)",
+    (val) => val.split(",")
+  )
+  .option(
+    "--watch-files <exts>",
+    "file extensions to watch (comma-separated)",
+    (val) => val.split(",")
+  )
+  .option(
+    "--support-files <exts>",
+    "support file extensions (comma-separated)",
+    (val) => val.split(",")
+  )
+  .option("--public-dir <dir>", "static public directory")
+  .option("-b, --build <mode>", "build mode ('static' or 'server')")
+  .option("-p, --port <number>", "port to listen on", (v) => parseInt(v, 10));
 
 program
   .command("build")
