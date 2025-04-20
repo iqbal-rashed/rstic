@@ -1,6 +1,6 @@
 {
   "name": "rstic",
-  "version": "0.0.10-beta",
+  "version": "0.0.8",
   "description": "A blazing-fast static site generator with live reload and EJS support, designed for modern development workflows.",
   "license": "MIT",
   "bin": {

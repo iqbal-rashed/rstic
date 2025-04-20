@@ -90,7 +90,9 @@ Default config structure:
   watchDirs: ["src"],
   watchFiles: [".html", ".ejs", ".css", ".js"],
   supportFiles: [".html", ".ejs"],
-  publicDir: "public"
+  publicDir: "public",
+  build: "server", // server or static
+  port: 3003,
 }
 ```
 
